@@ -1,0 +1,36 @@
+#playercreator td select {
+	width: 146px;
+}
+
+#playercreator select {
+	margin-right: 0.5em;
+}
+
+#playercreator label {
+	font-weight: bold;
+	padding-right: 1em;
+}
+
+#playercreator span {
+	font-weight: normal;
+}
+
+#playercreator td {
+	padding-right: 15px;
+	white-space: nowrap;
+}
+#playercreator .header {
+	font-weight: bold; 
+}
+
+#playercreator .attr {
+	font-weight: bold; 
+}
+
+#playercreator .credits {
+    font-size: small;
+}
+
+body {
+    background-color: #888888;
+}

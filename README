@@ -1,0 +1,63 @@
+Copyright (C) 2011 by AngryMikeGrrrr
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+This code mimics the logic that would happen inside of EA's NHL 12 when one creates their EASHL player. 
+
+FAQ: 
+
+Q: So I created my guy with your tool. How do I import him into the game? 
+A: This tool is for planning purpose only. You cannot import your player into NHL 12. 
+You will have to navigate the game menus and create your character there. 
+
+Q: So, can I put this on my website? 
+A: Of course!
+
+Q: How would I go about doing that? 
+A: See the reference playercreator.html file for an example usage of the code. You'll 
+have to include jQuery 1.6.2, the attached playercreator.js file and the jquery.base64.min.js 
+plugin into your webpage. Then, simply call "new PlayerCreator({render_to : "some_div"});" 
+In this example, "some_div" is a div with the id of "some_div" that is located on your page. 
+You must specify the "render_to" option.
+
+Q: I don't have a website. I just want to use the damn thing. How do I do that? 
+A: Simply download the project's zip file to your computer. Then un-zip it with your favorite
+zipping program. Then simply double click on "playercreator.html".
+
+Q: Do I need to show the credits on my page? 
+A: No. You can pass in "credits : false" in the options in order to not show the credits message. It's
+okay, I won't judge you.
+
+Q: Does this have goalie attributes? 
+A: Yes it does! It has goalie boosts as well. 
+
+Q: I created a player with your tool but my overall isn't the same as what's reported in the game. 
+A: This is a known issue. The overall calculation inside of NHL 12 includes some attributes that 
+you cannot edit (i.e. Poise). If someone were to give me the hidden attributes and their values, then
+I may update the tool to accurately calculate the average. 
+
+Q: Can I report bugs or suggest features? 
+A: Of course. Either do so on the github page or message me via XBL. I don't log onto the PSN anymore. 
+
+Q: What features are you planning on adding? 
+A: In the near future, I will add the support for linkable builds (just like last year) so you can share your
+build with others and allow them to edit your build in place. I'm also planning on adding different output formats 
+for sharing a read-only view of your build with others. The formats will include text and bbcode. I may also add the 
+boost pack info to the tool. 
