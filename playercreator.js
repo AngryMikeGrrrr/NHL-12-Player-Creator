@@ -130,6 +130,7 @@ function PlayerCreator(options) {
     function render_attributes(categories) {
         var i = 0; 
         $root.find(".attribute").empty();
+        $root.find(".reset").remove();
         $.each(categories, function(name, attrs) {         
             $($root.find(".section_title")[i]).html(name); 
             $($root.find(".attribute")[i]).append("<tr><td></td><td class=\"header\">Value</td><td class=\"header\">XP Cost</td><td class=\"header\">Boost</td><td class=\"header\">Total</td><td></td><td></td></tr>"); 
@@ -163,6 +164,10 @@ function PlayerCreator(options) {
                     $root.find(".average").html(calculate_average());
                 });
             });
+            $($root.find(".attribute")[i]).after("<input class='reset' type='button' value='Reset' \>");
+            $root.find(".reset:last").click(function(){
+               reset_group(name); 
+            });
             i += 1; 
         });    
     }
@@ -174,7 +179,7 @@ function PlayerCreator(options) {
         $.each(boosts, function(boost, attrs) {
             $elm.append("<tr><td class=\"attr\">"+boost+"</td>");
             for(var i = 0; i < 3; i++) {
-                $elm.find("tr:last").append("<td><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"1\">+1</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"3\">+3</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"5\">+5</input><select class=\"slot"+i+"\"><option value=\"\" selected=\"selected\">&nbsp;</option>");
+                $elm.find("tr:last").append("<td><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"1\">+1</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"3\">+3</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"5\">+5</input><select class=\"slot\"><option value=\"\" selected=\"selected\">&nbsp;</option>");
                 $root.find("tr:last > td:last > :radio").attr("disabled", "disabled");
                 $root.find("tr:last > td:last > :radio").change(function() {
                     attr_select = $(this).parent().find("select");
@@ -208,12 +213,18 @@ function PlayerCreator(options) {
                     }                
                 }); 
                 $.each(attrs, function(index, attr) {
-                    $elm.find(".slot"+i+":last").append("<option value=\""+attr+"\">"+attr+"</option>");
+                    $elm.find(".slot:last").append("<option value=\""+attr+"\">"+attr+"</option>");
                 });
                 $elm.append("</select></td>");   
             }
             $elm.append("</tr>");
-        })
+        });
+        $elm.after("<input class='reset' type='button' value='Reset' \>");
+        $root.find(".reset:last").click(function() {
+            $(".slot").val("");
+            $(".slot").change();
+            $(".boosts").find("input").attr("disabled", "disabled");
+        });      
     }
 
 
@@ -221,19 +232,38 @@ function PlayerCreator(options) {
         initial_data = creator[player.context].attributes[build_name];
         player.build = build_name;    
         player.attrs = {};
-        $.each(initial_data, function(attr_name) {
-            player.attrs[attr_name] = this.initial;     //e.g. {"Deking" : 75}
+        $.each(initial_data, function(attr) {
+            reset_attribute(attr);
         });
+    }
     
-        //update all fields -- not a fan of having css selectors here
-        $.each(player.attrs, function(attr, value){
-            boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
-            $elm = $root.find('.attribute tr:contains("'+attr+'")');
-            $elm.trigger('pc:update_value', value);
-            $elm.trigger('pc:update_cost', 10);
-            $elm.trigger('pc:update_boost', boost);
-            $elm.trigger('pc:update_total', value + boost);
-        }); 
+    function reset_group(group_name) {
+        keys = [];
+        for(var key in creator[player.context].attribute_categories) 
+            keys.push(key);   
+        attrs = creator[player.context].attribute_categories[group_name];
+        $.each(attrs, function(index, attr) {
+            reset_attribute(attr);
+        });
+        xp = creator.card_types[player.card];
+        if(group_name == keys[0]) 
+            player.off_xp = xp;
+        if(group_name == keys[1]) 
+            player.def_xp = xp;
+        if(group_name == keys[2]) 
+            player.ath_xp = xp;
+        $root.find(".xp").trigger("pc:update_xp");
+    }
+    
+    function reset_attribute(attr) {
+        value = creator[player.context].attributes[player.build][attr].initial;
+        player.attrs[attr] = value;
+        boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
+        $elm = $root.find('.attribute tr:contains("'+attr+'")');
+        $elm.trigger('pc:update_value', value);
+        $elm.trigger('pc:update_cost', 10);
+        $elm.trigger('pc:update_boost', boost);
+        $elm.trigger('pc:update_total', value + boost);
     }
 
     function change_card(card) {
