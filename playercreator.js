@@ -4,7 +4,7 @@
 	when creating a player in EA's NHL 12. Anyone is allowed to
 	modify this code as they see fit and use it on whatever website they
 	choose. See the README for more info.
-@Version	1.0 
+@Version	1.1
 @Author	AngryMikeGrrrr
 @Home	
 @Usage
@@ -31,7 +31,7 @@ function PlayerCreator(options) {
 
     function init() {
         
-        $root.append("<h1>NHL 12 Player Creator</h1><p><label>Type:</label><select id=\"type\"><option value=\"player\">Player</option><option value=\"goalie\">Goalie</option></select><label>Build:</label><select id=\"builds\"></select><label>Card:</label><select id=\"cards\"></select><span id=\"share_build\"></span></p><h2>Overall: <span class=\"average\"></span></h3><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"offxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"defxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"athxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3>Boosts</h3><table class=\"boosts\"></table>");
+        $root.append("<h1>NHL 12 Player Creator</h1><p><label>Type:</label><select id=\"type\"><option value=\"player\">Player</option><option value=\"goalie\">Goalie</option></select><label>Build:</label><select id=\"builds\"></select><label>Card:</label><select id=\"cards\"></select><p id=\"share_build\"></p></p><h2>Overall: <span class=\"average\"></span></h3><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"offxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"defxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3 class=\"section_title\"></h3><p class=\"header\">XP: <span id=\"athxp\" class=\"xp\"></span></p><table class=\"attribute\"></table><hr><h3>Boosts</h3><table class=\"boosts\"></table>");
         
         if(options.credits != false)
             $root.append("<p class=\"credits\">Created by <a href=\"http://live.xbox.com/en-US/member/AngryMikeGrrrr\">AngryMikeGrrrr</a> in 2011</p>");
@@ -40,6 +40,7 @@ function PlayerCreator(options) {
     	$.getJSON('attributes.json', function(data) {
             creator = data;
             render_cards(creator.card_types, $root.find("#cards")); 
+            render_share($root.find("#share_build"));
             render_page();   
     	});
 	
@@ -60,6 +61,38 @@ function PlayerCreator(options) {
         $root.find("#builds").unbind();
         render_builds(creator[player.context].types, $root.find("#builds"));
         render_boosts(creator[player.context].boosts, $root.find(".boosts"));
+    }
+    
+    function render_share($elm) {
+        $elm.css({"cursor": "pointer", "color": "#03f"});
+        $elm.append("<span>[+] Share this Build</span>");
+        $elm.find("span").click(function() {
+            if($(this).text().search(/\+/) > -1)
+                $(this).text($(this).text().replace("+", "-"));
+            else 
+                $(this).text($(this).text().replace("-", "+"));
+                
+            $elm.find("div").slideToggle();
+        }); 
+        
+        $elm.append("<div style='display:none'><p><input class='share' type='button' value='plain'/><input class='share' type='button' value='bbcode'/><input class='share' type='button' value='reddit'/></p><textarea rows='30' cols='50'></textarea></div>");
+        $elm.find("div > p > input").css("margin-right", "0.5em");
+        
+        $elm.find(".share").click(function() {
+            switch($(this).val()) {
+                case "plain":
+                    $elm.find("textarea").html(output_as_plain()); 
+                    break;
+                case "bbcode":
+                    $elm.find("textarea").html(output_as_bbcode()); 
+                    break;
+                case "reddit":
+                    $elm.find("textarea").html(output_as_reddit());
+                    break;    
+                default:
+                    break; 
+            }
+        });
     }
 
     function render_builds(builds, $elm) {
@@ -97,6 +130,7 @@ function PlayerCreator(options) {
     function render_attributes(categories) {
         var i = 0; 
         $root.find(".attribute").empty();
+        $root.find(".reset").remove();
         $.each(categories, function(name, attrs) {         
             $($root.find(".section_title")[i]).html(name); 
             $($root.find(".attribute")[i]).append("<tr><td></td><td class=\"header\">Value</td><td class=\"header\">XP Cost</td><td class=\"header\">Boost</td><td class=\"header\">Total</td><td></td><td></td></tr>"); 
@@ -130,6 +164,10 @@ function PlayerCreator(options) {
                     $root.find(".average").html(calculate_average());
                 });
             });
+            $($root.find(".attribute")[i]).after("<input class='reset' type='button' value='Reset' \>");
+            $root.find(".reset:last").click(function(){
+               reset_group(name); 
+            });
             i += 1; 
         });    
     }
@@ -141,7 +179,7 @@ function PlayerCreator(options) {
         $.each(boosts, function(boost, attrs) {
             $elm.append("<tr><td class=\"attr\">"+boost+"</td>");
             for(var i = 0; i < 3; i++) {
-                $elm.find("tr:last").append("<td><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"1\">+1</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"3\">+3</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"5\">+5</input><select class=\"slot"+i+"\"><option value=\"\" selected=\"selected\">&nbsp;</option>");
+                $elm.find("tr:last").append("<td><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"1\">+1</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"3\">+3</input><input type=\"radio\" name=\""+boost+"_"+i+"\" value=\"5\">+5</input><select class=\"slot\"><option value=\"\" selected=\"selected\">&nbsp;</option>");
                 $root.find("tr:last > td:last > :radio").attr("disabled", "disabled");
                 $root.find("tr:last > td:last > :radio").change(function() {
                     attr_select = $(this).parent().find("select");
@@ -175,12 +213,18 @@ function PlayerCreator(options) {
                     }                
                 }); 
                 $.each(attrs, function(index, attr) {
-                    $elm.find(".slot"+i+":last").append("<option value=\""+attr+"\">"+attr+"</option>");
+                    $elm.find(".slot:last").append("<option value=\""+attr+"\">"+attr+"</option>");
                 });
                 $elm.append("</select></td>");   
             }
             $elm.append("</tr>");
-        })
+        });
+        $elm.after("<input class='reset' type='button' value='Reset' \>");
+        $root.find(".reset:last").click(function() {
+            $(".slot").val("");
+            $(".slot").change();
+            $(".boosts").find("input").attr("disabled", "disabled");
+        });      
     }
 
 
@@ -188,19 +232,38 @@ function PlayerCreator(options) {
         initial_data = creator[player.context].attributes[build_name];
         player.build = build_name;    
         player.attrs = {};
-        $.each(initial_data, function(attr_name) {
-            player.attrs[attr_name] = this.initial;     //e.g. {"Deking" : 75}
+        $.each(initial_data, function(attr) {
+            reset_attribute(attr);
         });
+    }
     
-        //update all fields -- not a fan of having css selectors here
-        $.each(player.attrs, function(attr, value){
-            boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
-            $elm = $root.find('.attribute tr:contains("'+attr+'")');
-            $elm.trigger('pc:update_value', value);
-            $elm.trigger('pc:update_cost', 10);
-            $elm.trigger('pc:update_boost', boost);
-            $elm.trigger('pc:update_total', value + boost);
-        }); 
+    function reset_group(group_name) {
+        keys = [];
+        for(var key in creator[player.context].attribute_categories) 
+            keys.push(key);   
+        attrs = creator[player.context].attribute_categories[group_name];
+        $.each(attrs, function(index, attr) {
+            reset_attribute(attr);
+        });
+        xp = creator.card_types[player.card];
+        if(group_name == keys[0]) 
+            player.off_xp = xp;
+        if(group_name == keys[1]) 
+            player.def_xp = xp;
+        if(group_name == keys[2]) 
+            player.ath_xp = xp;
+        $root.find(".xp").trigger("pc:update_xp");
+    }
+    
+    function reset_attribute(attr) {
+        value = creator[player.context].attributes[player.build][attr].initial;
+        player.attrs[attr] = value;
+        boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
+        $elm = $root.find('.attribute tr:contains("'+attr+'")');
+        $elm.trigger('pc:update_value', value);
+        $elm.trigger('pc:update_cost', 10);
+        $elm.trigger('pc:update_boost', boost);
+        $elm.trigger('pc:update_total', value + boost);
     }
 
     function change_card(card) {
@@ -332,7 +395,49 @@ function PlayerCreator(options) {
         else
             $plus1.removeAttr('disabled');             
     }
-
+    
+    function output_as_plain() {
+        str = ""
+        str += player.build + ", " + player.card + ", Overall: "+ calculate_average() + "\n\n";
+         $.each(player.attrs, function(attr, value) {
+             str += attr + ": "+ value;
+             boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
+             if(boost > 0)
+                str += " (+"+boost+")";
+             str += "\n";
+         });             
+        return str;
+    }
+    
+    function output_as_bbcode() {
+        str = ""
+        str += "[b]Build:[/b] "+player.build + "\n" 
+        str += "[b]Card:[/b] "+player.card +"\n\n";
+        str += "[table][b]Attribute[/b] | [b]Value[/b] | [b]Boost[/b] | [b]Total[/b] \n"
+         $.each(player.attrs, function(attr, value) {
+             str += attr + "|"+ value + "|";
+             boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
+             if(boost > 0)
+                str += "+"+boost;
+             str += "| "+(value+boost)+"\n";
+         });     
+        str += "[b]Overall[/b]|||"+ calculate_average() + "[/table]"
+        return str;
+    }
+    
+    function output_as_reddit() {
+        str = ""
+        str += player.build + ", " + player.card + ", Overall: "+ calculate_average() + "\n\n";
+         $.each(player.attrs, function(attr, value) {
+             str += attr + ": "+ value;
+             boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
+             if(boost > 0)
+                str += " (+"+boost+")";
+             str += "\n\n";
+         });             
+        return str;
+    }
+    
 
     function getUrlVars() { 
     	var map = {}; 
