@@ -427,7 +427,7 @@ function PlayerCreator(options) {
     
     function output_as_reddit() {
         str = ""
-        str += "**Builds:** " + player.build + "\n\n"
+        str += "**Build:** " + player.build + "\n\n"
         str += "**Card:** " + player.card + "\n\n"
         str += "Attribute|Value|Boost|Total\n"
         str += ":---|---:|---:|---:\n"
