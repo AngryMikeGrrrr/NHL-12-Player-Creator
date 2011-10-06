@@ -75,7 +75,7 @@ function PlayerCreator(options) {
             $elm.find("div").slideToggle();
         }); 
         
-        $elm.append("<div style='display:none'><p><input class='share' type='button' value='plain'/><input class='share' type='button' value='bbcode'/><input class='share' type='button' value='reddit'/></p><textarea rows='30' cols='50'></textarea></div>");
+        $elm.append("<div style='display:none'><p><input class='share' type='button' value='plain'/><input class='share' type='button' value='bbcode'/><input class='share' type='button' value='reddit'/></p><textarea rows='31' cols='50'></textarea></div>");
         $elm.find("div > p > input").css("margin-right", "0.5em");
         
         $elm.find(".share").click(function() {
@@ -427,15 +427,19 @@ function PlayerCreator(options) {
     
     function output_as_reddit() {
         str = ""
-        str += player.build + ", " + player.card + ", Overall: "+ calculate_average() + "\n\n";
+        str += "**Builds** " + player.build + "\n\n"
+        str += "**Card** " + player.card + "\n\n"
+        str += "Attribute|Value|Boost|Total\n"
+        str += ":---|---:|---:|---:\n"
          $.each(player.attrs, function(attr, value) {
-             str += attr + ": "+ value;
+             str += attr + "|"+ value + "|";
              boost = player.boosts[attr] == undefined ? 0 : player.boosts[attr]; 
              if(boost > 0)
-                str += " (+"+boost+")";
-             str += "\n\n";
-         });             
-        return str;
+                str += "+"+boost;
+             str += "|"+(value+boost)+"\n";
+         });   
+         str += "\n**Overall** " + calculate_average();          
+         return str;
     }
     
 
